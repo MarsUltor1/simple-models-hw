@@ -2,7 +2,7 @@
 const models = require('../models');
 
 // get the Cat model
-const { Cat } = models;
+const { Cat, Dog } = models;
 
 // default fake data so that we have something to work with until we make a real Cat
 const defaultData = {
@@ -241,6 +241,76 @@ const notFound = (req, res) => {
   });
 };
 
+// Get the information about the dog requested and increase it's age by 1
+const getDog = async (req, res) => {
+  if (!req.body.name) {
+    res.status(400).json({
+      id: 'dogSearchMissingParams',
+      error: 'Name is required to search for a dog'
+    });
+  }
+
+  let doc;
+  try {
+    // Find the dog and increment its age
+    doc = await Dog.findOneAndUpdate(
+      { name: req.body.name },
+      { $inc: { age: 1 } },
+      { returnNewDocument: true }
+    ).exec();
+  }
+  catch (err) {
+    // Print error and return message to user
+    console.log(err);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+
+  // Send back error if nothing was found
+  if (!doc) {
+    return res.satus(404).json({ error: 'No dogs found with that name' });
+  }
+
+  // If we find the dog return it's data
+  return res.json({
+    name: doc.name,
+    breed: doc.breed,
+    age: doc.age
+  });
+};
+
+// add a dog to the database
+const createDog = async (req, res) => {
+  if (!req.body.name || !req.body.breed || !req.body.age) {
+    // Send error if missing params
+    return res.status(400).json({ 
+      id: 'createDogMissingParams',
+      error: 'Name, Breed, and Age are all required' 
+    });
+  }
+
+  const dogData = {
+    name: req.body.name,
+    breed: req.body.breed,
+    age: req.body.age
+  };
+
+  const newDog = new Dog(dogData);
+
+  try {
+    await newDog.save();
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'failed to create dog' });
+  }
+
+  return res.json({
+    name: newDog.name,
+    breed: newDog.breed,
+    age: newDog.age,
+  });
+}
+
 // export the relevant public controller functions
 module.exports = {
   index: hostIndex,
@@ -252,4 +322,6 @@ module.exports = {
   updateLast,
   searchName,
   notFound,
+  getDog,
+  createDog,
 };
