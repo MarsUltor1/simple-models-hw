@@ -246,7 +246,7 @@ const getDog = async (req, res) => {
   if (!req.body.name) {
     res.status(400).json({
       id: 'dogSearchMissingParams',
-      error: 'Name is required to search for a dog'
+      error: 'Name is required to search for a dog',
     });
   }
 
@@ -256,10 +256,9 @@ const getDog = async (req, res) => {
     doc = await Dog.findOneAndUpdate(
       { name: req.body.name },
       { $inc: { age: 1 } },
-      { returnNewDocument: true }
+      { returnNewDocument: true },
     ).exec();
-  }
-  catch (err) {
+  } catch (err) {
     // Print error and return message to user
     console.log(err);
     return res.status(500).json({ error: 'Something went wrong' });
@@ -274,7 +273,7 @@ const getDog = async (req, res) => {
   return res.json({
     name: doc.name,
     breed: doc.breed,
-    age: doc.age
+    age: doc.age,
   });
 };
 
@@ -282,24 +281,23 @@ const getDog = async (req, res) => {
 const createDog = async (req, res) => {
   if (!req.body.name || !req.body.breed || !req.body.age) {
     // Send error if missing params
-    return res.status(400).json({ 
+    return res.status(400).json({
       id: 'createDogMissingParams',
-      error: 'Name, Breed, and Age are all required' 
+      error: 'Name, Breed, and Age are all required',
     });
   }
 
   const dogData = {
     name: req.body.name,
     breed: req.body.breed,
-    age: req.body.age
+    age: req.body.age,
   };
 
   const newDog = new Dog(dogData);
 
   try {
     await newDog.save();
-  }
-  catch (err) {
+  } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'failed to create dog' });
   }
@@ -309,11 +307,20 @@ const createDog = async (req, res) => {
     breed: newDog.breed,
     age: newDog.age,
   });
-}
+};
 
-const hostPage4 = (req, res) = {
+const hostPage4 = async (req, res) => {
+  try {
+    // get all the dogs
+    const docs = await Dog.find({}).lean().exec();
 
-}
+    // render the page with the dogs
+    return res.render('page4', { title: 'page4', dogs: docs });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'failed to find dogs' });
+  }
+};
 
 // export the relevant public controller functions
 module.exports = {
