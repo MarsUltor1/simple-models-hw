@@ -311,12 +311,17 @@ const createDog = async (req, res) => {
   });
 }
 
+const hostPage4 = (req, res) = {
+
+}
+
 // export the relevant public controller functions
 module.exports = {
   index: hostIndex,
   page1: hostPage1,
   page2: hostPage2,
   page3: hostPage3,
+  page4: hostPage4,
   getName,
   setName,
   updateLast,

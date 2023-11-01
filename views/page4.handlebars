@@ -8,7 +8,14 @@
 </head>
 
 <body>
-  
+  {{#if dogs}}
+    <h1>Dogs</h1>
+    <ul>
+      {{#each dogs}}
+        <li> {{this.name}} is a {{this.breed}} that is {{this.age}} years old</li>
+      {{/each}}
+    </ul>
+  {{/if}}
 </body>
 
 </html>
